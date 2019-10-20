@@ -21,6 +21,8 @@ bool deseo_salir = false;
 int carrito_lista[100];
 int indice_carrito = 0;
 
+#define GetSize(array_enteros) (sizeof(array_enteros)/sizeof(*(array_enteros)))
+
 //////////////////////////////////////
 
 void titulo(){
@@ -43,8 +45,8 @@ void registrarCompardor(){
 	cout <<"Apellido: ";
 	cin>>apellido_comprador;
 	
-	cout <<"Direccion: ";
-	cin>>direccion_comprador;
+	/*cout <<"Direccion: ";
+	cin>>direccion_comprador;*/
 	
 	cout <<"Telefono: ";
 	cin>>telefono_comprador;
@@ -52,7 +54,7 @@ void registrarCompardor(){
 	cout <<"Numero de Idendificacion: ";
 	cin>>identificacion_comprador;
 	
-	cout <<"clave: ";
+	cout <<"clave (numeros): ";
 	cin>>clave_comprador;
 	
 	cout << endl;
@@ -70,16 +72,16 @@ void registrarProducto(string nombre, string descripcion, int codigo, double pre
 
 /*No registrar mas de 10 productos*/
 void registrarProductos(){	
-	registrarProducto("lapiz","Elemento de grafito...", 0, 700);
-	registrarProducto("Esfero","Elemento de grafito...", 1, 1000);
-	registrarProducto("Borrador","Elemento de grafito...", 2, 200);
-	registrarProducto("Tajalapiz","Elemento de grafito...", 3, 400);
-	registrarProducto("Cartuchera","Elemento de grafito...", 4, 3400);
-	registrarProducto("Cartulina","Elemento de grafito...", 5, 2500);
-	registrarProducto("Micropunta","Elemento de grafito...", 6, 2000);
-	registrarProducto("Plumon","Elemento de grafito...", 7, 1500);
-	registrarProducto("Papel Iris","Elemento de grafito...", 8, 100);
-	registrarProducto("Carton Paja","Elemento de grafito...", 9, 500);
+	registrarProducto("lapiz","Elemento de grafito...", 1, 700);
+	registrarProducto("Esfero","Elemento de grafito...", 2, 1000);
+	registrarProducto("Borrador","Elemento de grafito...", 3, 200);
+	registrarProducto("Tajalapiz","Elemento de grafito...", 4, 400);
+	registrarProducto("Cartuchera","Elemento de grafito...", 5, 3400);
+	registrarProducto("Cartulina","Elemento de grafito...", 6, 2500);
+	registrarProducto("Micropunta","Elemento de grafito...", 7, 2000);
+	registrarProducto("Plumon","Elemento de grafito...", 8, 1500);
+	registrarProducto("Papel Iris","Elemento de grafito...", 9, 100);
+	registrarProducto("Carton Paja","Elemento de grafito...", 10, 500);
 }
 
 void listadoProductos() {
@@ -89,7 +91,67 @@ void listadoProductos() {
 	}
 }
 
+/*Se calcula costo solo de 100 datos*/
+int calcularCosto(){
+	int costoCantidad = 0;
+	for (int i = 0; i < 100; i++){
+		/*Si dentro del carrito de listas existe el dato*/
+		int posicion = carrito_lista[i]-1;
+		if(carrito_lista[i] != 0){
+			costoCantidad = costoCantidad + precio_producto[posicion];
+		}
+	}
+	return costoCantidad;
+}
+
+/*No se pueden agregar mas de 100 productos*/
+bool agregarProductoAlCarrito() {
+	int cod_temp;
+	titulo();
+	listadoProductos();
+	cout << " " << endl;
+	cout << "Ingrese el codigo del producto a agregar " << endl;
+	cin >> cod_temp;
+	
+	/*Revisar si el producto existe, de ser asi agregarlo*/
+	if( cod_temp != 0 ){
+		for(int i = 0; i < 100; i++) {
+			if (codigo_producto[i] == cod_temp){	
+					carrito_lista[indice_carrito] = cod_temp;
+					indice_carrito++;
+					return true;
+			}
+		}	
+	}
+	return false;
+}
+
+void eliminarDatosArreglos(){
+	indice_producto = 0;
+	indice_carrito = 0;
+		
+	for(int i = 0; i < GetSize(carrito_lista); i++){
+		carrito_lista[i] = 0;
+	}
+	
+}
+
+/*No se pueden mostrar mas de 100 productos*/
+void mostrarCarrito() {
+	for (int i = 0; i < 100; i++){
+		if(carrito_lista[i] != 0){
+			int posicion = carrito_lista[i]-1;
+			cout << " | Codigo: " <<  codigo_producto[posicion] << " | Nombre: " << nombre_producto[posicion] <<  " | Precio: " << precio_producto[posicion] << " | Descripcion: " << descipcion_producto[posicion] <<endl;
+		}
+
+	}
+	cout <<  endl;
+}
+
 void imprimirRecibo(){
+	/*Variables Locales*/
+	int costoTemp, ivaTemp;
+	
 	titulo();
 	cout << "                     *** Vendedor ***                    " << endl;
 	cout << "Juan Ortiz" << endl;
@@ -100,60 +162,75 @@ void imprimirRecibo(){
 	cout << "C.C " <<  identificacion_comprador << endl;
 	cout << telefono_comprador << "-"<<  direccion_comprador << endl;
 	cout << endl;
+	mostrarCarrito();
+	cout << endl;
+
+	costoTemp = calcularCosto();
+	ivaTemp = costoTemp * 16 / 100;
 	
-}
-
-/*No se pueden agregar mas de 100 productos*/
-void agregarProductoAlCarrito() {
-	int cod_temp;
-	titulo();
-	listadoProductos();
-	cout << " " << endl;
-	cout << "Ingrese el codigo del producto a agregar " << endl;
-	cin >> cod_temp;
-	carrito_lista[indice_carrito] = cod_temp;
-	indice_carrito++;
-}
-
-/*No se pueden agregar mas de 100 productos*/
-void mostrarCarrito() {
-	for (int i = 0; i < 10; i++){
-		cout << carrito_lista [i] <<endl;
-	}
+	cout << "Subtotal: " << costoTemp << endl;
+	cout << "IVA: " << ivaTemp << endl;	
+	cout << "Total: " << ivaTemp + costoTemp << endl;
+	cout << endl;
+	system("pause");
 }
 
 void carrito() {
-	titulo();
 	
 	bool listoCarrito = false;
 	char op ;
-	
+		
 	while( listoCarrito != true) {
+		system("cls"); 
+		titulo();
+		
 		cout << "> (C) Agregar porduto al carrito de compras" << endl;
 		cout << "> (M) Mostar Carrito" << endl;
-		cout << "> (L) Listos" << endl;
+		cout << "> (G) Generar Recibo" << endl;
+		cout << "> (N) Nuevo Comprador" << endl;
 		cin >> op;
 		switch(op){
 			case 'C':
-			case 'c': 
-				agregarProductoAlCarrito(); /*TODO*/
+			case 'c':
+			{
+				bool fueAgregado = agregarProductoAlCarrito(); 
+				if(fueAgregado == true)
+					cout << "Agregado al Carrito" << endl;
+				else
+					cout << "No fue agregado al Carrito" << endl;
+				system("pause");
 				break;
-			case 'L':
-			case 'l': 
+			}
+			case 'G':
+			case 'g': 
+			{
 				imprimirRecibo();
-				break;		
+				break;	
+			}
 			case 'M':
 			case 'm': 
+			{
 				mostrarCarrito();
+				system("pause");
 				break;	
+			}
+			case 'N':
+			case 'n': 
+			{
+				listoCarrito = true;
+				eliminarDatosArreglos();
+			}
+			
 		} 
 	}
 }
 
+
+
 void menu(){
 	/*Variable local*/
 	char menu_desicion;
-		
+	
 	titulo();
 	cout << "===== Bienvenido, ingrese la letra que aparece en el parentesis =====" << endl;
 	cout << "" << endl;
@@ -179,7 +256,7 @@ void menu(){
 		case 's': 
 			exit(0);
 			break;
-		defaul:
+		default:
 			menu();			
 	} 
 }
@@ -191,6 +268,7 @@ int main(int argc, char** argv) {
 	
 	/*Loop de mensajes*/
 	while(deseo_salir == false){
+		system("cls"); 	
 		menu();
 	}
 	
